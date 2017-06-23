@@ -1,0 +1,12 @@
+pittyak_web:
+  build: .
+  links:
+    - pittyak_db
+  ports:
+    - "8000:8000"
+pittyak_db:
+  image: mysql
+  environment:
+    MYSQL_PASSWORD: password
+    MYSQL_USER: user
+    MYSQL_ROOT_PASSWORD: password
