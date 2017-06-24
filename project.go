@@ -50,6 +50,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 	rows, err := db.Query("SELECT * FROM messages")
 	// If we experience some kind of error
 	if err != nil {
+		checkError(err)
 		w.WriteHeader(500)
 		w.Write([]byte("Uh oh!"))
 		return
@@ -71,8 +72,12 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 		message.Updoots = ups
 		messages = append(messages, message)
 	}
+
 	// Makes sure the client sees application/json
 	w.WriteHeader(http.StatusOK)
+	if messages == nil {
+		messages = make([]Message, 0)
+	}
 	// else we should have our rows
 	json.NewEncoder(w).Encode(messages)
 }
@@ -161,9 +166,11 @@ main is a function
 */
 func main() {
 	// Note that here we must use a strict = rather than :=
-	db, err = sql.Open("mysql", "nuser:npassword@tcp(pittyak_db:3306)/testdb")
+	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb")
+	if err != nil {
+		checkError(err)
+	}
 
-	//checkError(err)
 	defer db.Close()
 
 	router := mux.NewRouter()
