@@ -3,10 +3,14 @@ pittyak_web:
   links:
     - pittyak_db
   ports:
-    - "8000:8000"
+    - "3000:3000"
+  volumes:
+    - .:/app/src/github.com/domtheporcupine/pittchat
 pittyak_db:
   image: mysql
   environment:
-    MYSQL_PASSWORD: password
-    MYSQL_USER: user
-    MYSQL_ROOT_PASSWORD: password
+    MYSQL_PASSWORD: npassword
+    MYSQL_USER: nuser
+    MYSQL_ROOT_PASSWORD: npassword
+  ports:
+    - "3306:3306"
