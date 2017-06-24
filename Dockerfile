@@ -1,9 +1,9 @@
 # Alpine is awesome and lightweight
 FROM golang:1.8.3-alpine
 # Install some things to make development easier
-RUN apk update && apk add git bash
+RUN apk update && apk add git bash mysql-client
 # Set up a go environment
-RUN mkdir -p /app/src/github.com/domtheporcupine/pittchat
+RUN mkdir -p /app/src/github.com/domtheporcupine/updoots
 RUN mkdir -p /app/bin
 RUN mkdir -p /app/pkg
 # Set go environment variables
@@ -16,11 +16,11 @@ RUN go get golang.org/x/crypto/bcrypt
 RUN go get github.com/codegangsta/gin
 # Add all the go files in our local directory into
 # the container
-ADD ./*.go /app/src/github.com/domtheporcupine/pittchat
+ADD ./*.go /app/src/github.com/domtheporcupine/updoots
 # Build our app
-RUN go install github.com/domtheporcupine/pittchat
-WORKDIR /app/src/github.com/domtheporcupine/pittchat
+RUN go install github.com/domtheporcupine/updoots
+WORKDIR /app/src/github.com/domtheporcupine/updoots
 
-# Start the API
+# Start the API, using gin for auto reload/compile
 CMD ["gin", "run", "project"]
 
