@@ -13,3 +13,5 @@
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 gin-bin
+pub/node_modules
+pub/test/e2e/mock-template-build
