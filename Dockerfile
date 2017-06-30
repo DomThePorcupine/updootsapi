@@ -22,5 +22,5 @@ RUN go install github.com/domtheporcupine/updoots
 WORKDIR /app/src/github.com/domtheporcupine/updoots
 
 # Start the API, using gin for auto reload/compile
-CMD ["gin", "run", "project"]
+CMD ["gin", "run", "app"]
 
