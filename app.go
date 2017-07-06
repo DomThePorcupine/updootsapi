@@ -87,6 +87,7 @@ checkError is a function
 */
 func checkError(err error) {
 	fmt.Println(err.Error())
+	fmt.Println("------------------------------------------")
 }
 
 /*
@@ -98,7 +99,10 @@ func GetMessage(w http.ResponseWriter, req *http.Request) {
 	stmt, err := db.Prepare("SELECT * FROM messages where id=?")
 	checkError(err)
 	res, err := stmt.Exec(params["id"])
-	checkError(err)
+	if err != nil {
+		checkError(err)
+	}
+	
 	fmt.Println(res)
 	// If we don't find a person with that id
 	// send back a blank object
@@ -109,7 +113,6 @@ func GetMessage(w http.ResponseWriter, req *http.Request) {
 CreateMessage is a function
 */
 func CreateMessage(w http.ResponseWriter, req *http.Request) {
-	return
 	var nMessage Newmessage
 	json.NewDecoder(req.Body).Decode(&nMessage)
 	// declare a new message
@@ -118,10 +121,17 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		return
 	}
+	fmt.Println(nMessage.Message)
 	res, err := stmt.Exec(nMessage.Message, "Y87YUHG989839RW09U98")
-	checkError(err)
+	if err != nil {
+		checkError(err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		checkError(err)
+	}
 	// return the newly created object
-	json.NewEncoder(w).Encode(res)
+	json.NewEncoder(w).Encode(id)
 }
 
 /*
