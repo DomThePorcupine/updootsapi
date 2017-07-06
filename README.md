@@ -14,12 +14,25 @@
 
 6. `grant all privileges on testdb.* to 'nuser';`
 
-7. `\q` (you are now back in docker bash again)
+7.  Paste the following into the SQL shell:
+    ```
 
-8. `mysql -h updoots_db -unuser -pnpassword testdb` (you are now inside the SQL command line again)
+    create table `messages` (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `message` VARCHAR(250),
+        `userid` VARCHAR(20),
+        `updoots` INT,
+        PRIMARY KEY (`id`)
+    );
 
-9. `\q` to exit mysql cli, then `exit` to exit the docker containers bash
+    ```
 
-10. `docker-compose up`
+8. `\q` (you are now back in docker bash again)
 
-# Now navigate to http://127.0.0.1:3000, and start hacking on the go file!
+9. `mysql -h updoots_db -unuser -pnpassword testdb` (you are now inside the SQL command line again)
+
+1. `\q` to exit mysql cli, then `exit` to exit the docker containers bash
+
+11. `docker-compose up`
+
+## Now navigate to http://127.0.0.1:3000, and start hacking on the go file!
