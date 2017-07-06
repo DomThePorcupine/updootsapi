@@ -1,16 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"database/sql"
 	"log"
-
 	"fmt"
-
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
 )
 
 /*
@@ -38,80 +34,21 @@ type Database struct {
 	Key string `json:"key,omitempty"`
 }
 
+/*
+Empty is a struct
+*/
+type Empty struct {
+
+}
+
 // Declare our global variables in
 // place of our database
 var db *sql.DB
 var err error
-
 /*
-GetAllMessages is a function
-*/
-func GetAllMessages(w http.ResponseWriter, req *http.Request) {
-	rows, err := db.Query("SELECT * FROM messages")
-	// If we experience some kind of error
-	if err != nil {
-		checkError(err)
-		w.WriteHeader(500)
-		w.Write([]byte("Uh oh!"))
-		return
-	}
 
-	var id int
-	var mess string
-	var userid string
-	var ups int
-	// These are the messages we will
-	// be sending back
-	var messages []Message
-	//fmt.Println(rows)
-	for rows.Next() {
-		var message Message
-		rows.Scan(&id, &mess, &userid, &ups)
-
-		message.Message = mess
-		message.Updoots = ups
-		messages = append(messages, message)
-	}
-
-	// Makes sure the client sees application/json
-	w.WriteHeader(http.StatusOK)
-	if messages == nil {
-		messages = make([]Message, 0)
-	}
-	// else we should have our rows
-	json.NewEncoder(w).Encode(messages)
-}
-
-/*
-checkError is a function
-*/
-func checkError(err error) {
-	fmt.Println(err.Error())
-	fmt.Println("------------------------------------------")
-}
-
-/*
-GetMessage is a function
-*/
-func GetMessage(w http.ResponseWriter, req *http.Request) {
-	return
-	params := mux.Vars(req)
-	stmt, err := db.Prepare("SELECT * FROM messages where id=?")
-	checkError(err)
-	res, err := stmt.Exec(params["id"])
-	if err != nil {
-		checkError(err)
-	}
-	
-	fmt.Println(res)
-	// If we don't find a person with that id
-	// send back a blank object
-	json.NewEncoder(w).Encode(&Message{})
-}
-
-/*
 CreateMessage is a function
-*/
+
 func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	var nMessage Newmessage
 	json.NewDecoder(req.Body).Decode(&nMessage)
@@ -134,9 +71,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(id)
 }
 
-/*
 DeleteMessage is a function
-*/
 func DeleteMessage(w http.ResponseWriter, req *http.Request) {
 	return
 	params := mux.Vars(req)
@@ -155,9 +90,9 @@ func DeleteMessage(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte("Success."))
 }
 
-/*
+
 CreateTable is a function
-*/
+
 func CreateTable(w http.ResponseWriter, req *http.Request) {
 	return
 	var keys Database
@@ -169,12 +104,16 @@ func CreateTable(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("404 page not found"))
 		return
 	}
-}
+}*/
 
 /*
 main is a function
 */
 func main() {
+	fmt.Println("+----------------------+")
+	fmt.Println("| SERVER HAS RESTARTED |")
+	fmt.Println("+----------------------+")
+	
 	// Note that here we must use a strict = rather than :=
 	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb")
 	if err != nil {
@@ -183,13 +122,7 @@ func main() {
 
 	defer db.Close()
 
-	router := mux.NewRouter()
-
-	router.HandleFunc("/message", GetAllMessages).Methods("GET")
-	router.HandleFunc("/message/{id}", GetMessage).Methods("GET")
-	router.HandleFunc("/message", CreateMessage).Methods("POST")
-	router.HandleFunc("/message/{id}", DeleteMessage).Methods("DELETE")
-	router.HandleFunc("/admin/create", CreateTable).Methods("POST")
+	router := APIRouter()
 
 	log.Fatal(http.ListenAndServe(":3001", router))
 }
