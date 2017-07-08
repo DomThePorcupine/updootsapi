@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-
+  "github.com/gorilla/handlers"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -138,6 +138,11 @@ func main() {
 	defer db.Close()
 
 	router := APIRouter()
+  // Make sure to allow all requests
 
-	log.Fatal(http.ListenAndServe(":3001", router))
+  headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
+  originsOk := handlers.AllowedOrigins([]string{"*"})
+  methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "PATCH", "DELETE"})
+
+	log.Fatal(http.ListenAndServe(":3001", handlers.CORS(originsOk, headersOk, methodsOk)(router)))
 }

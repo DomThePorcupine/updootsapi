@@ -34,14 +34,14 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	tokenString, _ := token.SignedString(signingKey)
 
 	cookie := http.Cookie{
-		Name:     "Auth",
+		Name:     "Authorization",
 		Value:    tokenString,
 		Expires:  time.Now().Add(time.Hour * 24),
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tokenString)
+  //w.Header().Set("Content-Type", "application/json")
+	//json.NewEncoder(w).Encode(tokenString)
 }
 
 /*
