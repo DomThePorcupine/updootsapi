@@ -2,9 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
-	"github.com/gorilla/mux"
 	"fmt"
+	"net/http"
+
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
 )
 
 /*
@@ -16,10 +20,38 @@ func checkError(err error) {
 }
 
 /*
+GetToken is a function
+*/
+func GetToken(w http.ResponseWriter, req *http.Request) {
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	claims["admin"] = true
+	claims["userid"] = "DJ093L98JS"
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	tokenString, _ := token.SignedString(signingKey)
+
+	cookie := http.Cookie{
+		Name:     "Auth",
+		Value:    tokenString,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(tokenString)
+}
+
+/*
 GetAllMessages is a function
 */
 func GetAllMessages(w http.ResponseWriter, req *http.Request) {
-	rows, err := db.Query("SELECT * FROM messages")
+	rows, err := db.Query("SELECT messages.id, messages.message, " +
+		"coalesce(sum(votes.updoot) - sum(votes.downdoot),0) " +
+		"AS updoots FROM messages LEFT JOIN votes on messages.id = votes.message " +
+		"group by messages.id order by updoots desc")
 	// If we experience some kind of error
 	if err != nil {
 		checkError(err)
@@ -30,7 +62,6 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 
 	var id int
 	var mess string
-	var userid string
 	var ups int
 	// These are the messages we will
 	// be sending back
@@ -38,8 +69,8 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 	//fmt.Println(rows)
 	for rows.Next() {
 		var message Message
-		rows.Scan(&id, &mess, &userid, &ups)
-
+		rows.Scan(&id, &mess, &ups)
+		message.ID = id
 		message.Message = mess
 		message.Updoots = ups
 		messages = append(messages, message)
@@ -79,31 +110,35 @@ func GetMessage(w http.ResponseWriter, req *http.Request) {
 		checkError(err)
 	}
 
-	if(message.Message == "") {
+	if message.Message == "" {
 		var empty Empty
 		json.NewEncoder(w).Encode(empty)
 	} else {
 		json.NewEncoder(w).Encode(message)
 	}
 }
-	func CreateMessage(w http.ResponseWriter, req *http.Request) {
-		var nMessage Newmessage
-		json.NewDecoder(req.Body).Decode(&nMessage)
-		// declare a new message
-		// All new messages will have 0 updoots to start
-		stmt, err := db.Prepare("INSERT messages SET message=?,userid=?,updoots=0")
-		if err != nil {
-			return
-		}
-		fmt.Println(nMessage.Message)
-		res, err := stmt.Exec(nMessage.Message, "Y87YUHG989839RW09U98")
-		if err != nil {
-			checkError(err)
-		}
-		id, err := res.LastInsertId()
-		if err != nil {
-			checkError(err)
-		}
-		// return the newly created object
-		json.NewEncoder(w).Encode(id)
+
+/*
+CreateMessage is a function
+*/
+func CreateMessage(w http.ResponseWriter, req *http.Request) {
+	var nMessage Newmessage
+	json.NewDecoder(req.Body).Decode(&nMessage)
+	// declare a new message
+	// All new messages will have 0 updoots to start
+	stmt, err := db.Prepare("INSERT messages SET message=?,userid=?,updoots=0")
+	if err != nil {
+		return
 	}
+	fmt.Println(nMessage.Message)
+	res, err := stmt.Exec(nMessage.Message, "Y87YUHG989839RW09U98")
+	if err != nil {
+		checkError(err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		checkError(err)
+	}
+	// return the newly created object
+	json.NewEncoder(w).Encode(id)
+}

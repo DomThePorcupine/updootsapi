@@ -4,10 +4,25 @@ import (
 	"net/http"
 
 	"database/sql"
-	"log"
 	"fmt"
+	"log"
+
 	_ "github.com/go-sql-driver/mysql"
 )
+
+/*
+signingKey is our global sercret shhhhhhh
+*/
+var signingKey = []byte("super duper super secure lollipop")
+
+/*
+Claims is a struct
+*/
+type Claims struct {
+	Expires int64  `json:"exp"`
+	Admin   bool   `json:"admin"`
+	UserID  string `json:"userid"`
+}
 
 /*
 Message is a struct
@@ -38,13 +53,13 @@ type Database struct {
 Empty is a struct
 */
 type Empty struct {
-
 }
 
 // Declare our global variables in
 // place of our database
 var db *sql.DB
 var err error
+
 /*
 
 CreateMessage is a function
@@ -113,7 +128,7 @@ func main() {
 	fmt.Println("+----------------------+")
 	fmt.Println("| SERVER HAS RESTARTED |")
 	fmt.Println("+----------------------+")
-	
+
 	// Note that here we must use a strict = rather than :=
 	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb")
 	if err != nil {

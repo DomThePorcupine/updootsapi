@@ -13,10 +13,13 @@
 5. `create database testdb;`
 
 6. `grant all privileges on testdb.* to 'nuser';`
+  
+7. `\q` (you are now back in docker bash again)
 
-7.  Paste the following into the SQL shell:
+8. `mysql -h updoots_db -unuser -pnpassword testdb` (you are now inside the SQL command line again)
+
+9. Paste the following into the SQL shell:
     ```
-
     create table `messages` (
         `id` INT NOT NULL AUTO_INCREMENT,
         `message` VARCHAR(250),
@@ -24,14 +27,16 @@
         `updoots` INT,
         PRIMARY KEY (`id`)
     );
-
+    then:
+    create table `votes` ( 
+        `message` INT NOT NULL, 
+        `userid` VARCHAR(20), 
+        `updoot` TINYINT(1) NOT NULL default 0, 
+        `downdoot` TINYINT(1) NOT NULL default 0
+    );
     ```
 
-8. `\q` (you are now back in docker bash again)
-
-9. `mysql -h updoots_db -unuser -pnpassword testdb` (you are now inside the SQL command line again)
-
-1. `\q` to exit mysql cli, then `exit` to exit the docker containers bash
+10. `\q` to exit mysql cli, then `exit` to exit the docker containers bash
 
 11. `docker-compose up`
 

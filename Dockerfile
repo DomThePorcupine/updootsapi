@@ -11,14 +11,12 @@ ENV GOPATH /app
 ENV PATH $PATH:/app/bin
 # Install our go dependencies
 RUN go get github.com/go-sql-driver/mysql
+RUN go get github.com/dgrijalva/jwt-go
 RUN go get github.com/gorilla/mux
 RUN go get golang.org/x/crypto/bcrypt
 RUN go get github.com/codegangsta/gin
-# Add all the go files in our local directory into
-# the container
-ADD ./*.go /app/src/github.com/domtheporcupine/updoots
+
 # Build our app
-RUN go install github.com/domtheporcupine/updoots
 WORKDIR /app/src/github.com/domtheporcupine/updoots
 
 # Start the API, using gin for auto reload/compile
