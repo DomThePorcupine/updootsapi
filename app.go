@@ -6,8 +6,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-  "github.com/gorilla/handlers"
+
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/handlers"
 )
 
 /*
@@ -22,6 +23,14 @@ type Claims struct {
 	Expires int64  `json:"exp"`
 	Admin   bool   `json:"admin"`
 	UserID  string `json:"userid"`
+}
+
+/*
+Response is
+*/
+type Response struct {
+	Message string `json:"message,omitempty"`
+	Reason  string `json:"reason,omitempty"`
 }
 
 /*
@@ -138,11 +147,11 @@ func main() {
 	defer db.Close()
 
 	router := APIRouter()
-  // Make sure to allow all requests
+	// Make sure to allow all requests
 
-  headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
-  originsOk := handlers.AllowedOrigins([]string{"*"})
-  methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "PATCH", "DELETE"})
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "PATCH", "DELETE"})
 
 	log.Fatal(http.ListenAndServe(":3001", handlers.CORS(originsOk, headersOk, methodsOk)(router)))
 }

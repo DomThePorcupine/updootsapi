@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 )
 
 /*
@@ -19,10 +19,13 @@ func checkError(err error) {
 	fmt.Println("------------------------------------------")
 }
 
+var store = sessions.NewCookieStore([]byte("something-very-secret"))
+
 /*
 GetToken is a function
 */
 func GetToken(w http.ResponseWriter, req *http.Request) {
+
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
@@ -36,12 +39,17 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	cookie := http.Cookie{
 		Name:     "Authorization",
 		Value:    tokenString,
-		Expires:  time.Now().Add(time.Hour * 24),
+		Expires:  time.Now().AddDate(0, 0, 1),
 		HttpOnly: true,
+		Path:     "/",
 	}
+
 	http.SetCookie(w, &cookie)
-  //w.Header().Set("Content-Type", "application/json")
-	//json.NewEncoder(w).Encode(tokenString)
+
+	w.Header().Set("Content-Type", "application/json")
+	var resp Response
+	resp.Message = "success"
+	json.NewEncoder(w).Encode(resp)
 }
 
 /*
