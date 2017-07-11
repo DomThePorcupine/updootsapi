@@ -1,4 +1,4 @@
-#updoots™ API information
+# updoots™ API information
 
 I will try to outline the basic way you should interact with the updoots™ backend.
 
@@ -44,8 +44,8 @@ Step 3 is to actually doot people!
 
 | HTTP  method | URL                           | PAYLOAD |
 |--------------|-------------------------------|---------|
-| GET          | /api/v1/message/{id}/updoot   | NONE    |
-| GET          | /api/v1/message/{id}/downdoot | NONE    |
+| POST         | /api/v1/message/{id}/updoot   | NONE    |
+| POST         | /api/v1/message/{id}/downdoot | NONE    |
 
 If you are properly authenticated then the server should respond in the following manner to both requests:
 
