@@ -34,6 +34,12 @@
         `updoot` TINYINT(1) NOT NULL default 0, 
         `downdoot` TINYINT(1) NOT NULL default 0
     );
+    create table `geofences` ( 
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(80), 
+        `fence` GEOMETRY, 
+        PRIMARY KEY (id)
+    );
     ```
 
 10. `\q` to exit mysql cli, then `exit` to exit the docker containers bash

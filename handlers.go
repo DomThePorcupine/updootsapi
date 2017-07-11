@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -22,10 +23,57 @@ func checkError(err error) {
 var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
 /*
-GetToken is a function
+TokenRequest is a struct
+*/
+type TokenRequest struct {
+	Lat    float64 `json:"lat"`
+	Lon    float64 `json:"lon"`
+	UserID string  `json:"userid"`
+}
+
+/*
+GetToken is a very important function, it makes sure the user is within
+our geofences and not on some sort of school campus, it also assigns roles
+to people defining what they can and cannot do
 */
 func GetToken(w http.ResponseWriter, req *http.Request) {
+	// First we should parse to see if they are within
+	// the bounds of the geofence or even gave us a lat
+	// and long
+	var tr TokenRequest
+	json.NewDecoder(req.Body).Decode(&tr)
+	fmt.Println(tr.Lat)
+	fmt.Println(tr.Lon)
+	// Make sure they gave us a lat and long
+	if tr.Lat == 0 || tr.Lon == 0 {
+		json.NewEncoder(w).Encode(Response{"Not within geofence", "invalid_location"})
+		return
+	}
+	var point string
+	point = "'POINT(" + strconv.FormatFloat(tr.Lat, 'f', 6, 64) + " " + strconv.FormatFloat(tr.Lon, 'f', 6, 64) + ")'"
 
+	rows, err := db.Query("SELECT ST_CONTAINS(fence, PointFromText(?)) as valid FROM geofences order by valid desc limit 1", point)
+
+	if err != nil {
+		// Internal server error
+		fmt.Println(err.Error())
+		return
+	}
+	var truefalse int
+	// Grab the value we want
+	for rows.Next() {
+		rows.Scan(&truefalse)
+	}
+
+	if truefalse == 1 {
+		// They are within atleast one geofence, yay!
+		// Now we have to check for their userid
+	} else {
+		// They are not within it so return a message telling
+		// them to go to a real school
+		json.NewEncoder(w).Encode(Response{"Not within geofence", "invalid_location"})
+		return
+	}
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
@@ -36,6 +84,7 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 
 	tokenString, _ := token.SignedString(signingKey)
 
+	// Create our authorization cookie with the new token
 	cookie := http.Cookie{
 		Name:     "Authorization",
 		Value:    tokenString,
