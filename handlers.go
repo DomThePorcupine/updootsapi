@@ -233,7 +233,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 		for rows.Next() {
 			rows.Scan(&count)
 		}
-
+		fmt.Println("Count returned")
 		fmt.Println(count)
 		
 		if count == 0 {
@@ -241,6 +241,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 			if vote.Doot == 1 {
 				stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,updoot=1")
 				if err != nil {
+					fmt.Println("BADDDDDDDDDDD")
 					return
 				}
 				stmt.Exec(vote.Message, clms.UserID)
@@ -248,6 +249,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 			} else if vote.Doot == 0 {
 				stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,downdoot=1")
 				if err != nil {
+					fmt.Println("BADDDDDDDDDDD")
 					return
 				}
 				return
@@ -261,6 +263,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 			if vote.Doot == 1 {
 				stmt, err := db.Prepare("UPDATE votes SET updoot=1, downdoot=0 where message=? and userid=?")
 				if err != nil {
+					fmt.Println("BADDDDDDDDDDD")
 					return
 				}
 				stmt.Exec(vote.Message, clms.UserID)
@@ -268,6 +271,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 			} else if vote.Doot == 0 {
 				stmt, err := db.Prepare("UPDATE votes SET updoot=0, downdoot=1 where message=? and userid=?")
 				if err != nil {
+					fmt.Println("BADDDDDDDDDDD")
 					return
 				}
 				stmt.Exec(vote.Message, clms.UserID)
