@@ -99,11 +99,11 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 GetAllMessages is a function
 */
 func GetAllMessages(w http.ResponseWriter, req *http.Request) {
-	rows, err := db.Query("select id, messages.message, ifnull(doots,0) " + 
+	rows, err := db.Query("select id, messages.message, ifnull(doots,0) as totalvotes" + 
 							"from messages left join(select votes.message, " +
 							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
 							"as doots from votes group by votes.message) as votes " + 
-							"on messages.id = votes.message order by ifnull(doots,0) desc")
+							"on messages.id = votes.message having totalvotes > -3 order by ifnull(doots,0) desc")
 	
 	// If we experience some kind of error
 	if err != nil {
