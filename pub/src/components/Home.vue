@@ -143,13 +143,13 @@ export default {
       })
     },
     updoot: function (id) {
-      this.$http.post(API + '/doot', { doot: 1, message_id: id }).then(response => {
+      this.$http.post(API + '/doot', { doot: 1, message: id }).then(response => {
         // Here
         this.getMessages()
       })
     },
     downdoot: function (id) {
-      this.$http.post(API + '/doot', { doot: 0, message_id: id }).then(response => {
+      this.$http.post(API + '/doot', { doot: 0, message: id }).then(response => {
         // Here
         this.getMessages()
       })
