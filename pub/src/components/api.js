@@ -1,3 +1,3 @@
-const API = 'http://127.0.0.1:3000/api/v1'
+const API = 'https://updoot.us/api/v1'
 
 module.exports = API
