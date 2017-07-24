@@ -32,7 +32,7 @@ func main() {
 	// Note that here we must use a strict = rather than :=
 	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb")
 	if err != nil {
-		checkError(err)
+		return
 	}
 
 	defer db.Close()

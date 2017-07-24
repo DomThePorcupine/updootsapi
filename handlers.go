@@ -221,6 +221,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 	} else {
 		// We need to check and limit their votes
 		var count int
+		count = -17
 		rows, err := db.Query("select count(*) as count from votes where userid=?", clms.UserID)
 		if err != nil {
 			fmt.Println(err)
@@ -230,7 +231,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 		for rows.Next() {
 			rows.Scan(&count)
 		}
-
+		fmt.Println("here!")
 		if count == 0 {
 			// We can safely preform the action they want
 			if vote.Doot == 1 {
@@ -251,7 +252,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
 				return
 			}
-		} else {
+		} else if count == 1{
 			// otherwise we simply update the entry that already exists
 			if vote.Doot == 1 {
 				stmt, err := db.Prepare("UPDATE votes SET updoot=1, downdoot=0 where message=? and userid=?")
@@ -271,6 +272,9 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
 				return
 			}
+		} else {
+			json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
+			return
 		}
 	}
 }
