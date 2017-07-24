@@ -138,9 +138,12 @@ export default {
       console.log('yay')
     },
     onCreateClose: function () {
-      this.$http.post(API + '/message', { message: this.createpost.value }).then(response => {
-        this.getMessages()
-      })
+      if (this.createpost.value !== '') {
+        this.$http.post(API + '/message', { message: this.createpost.value }).then(response => {
+          this.getMessages()
+          this.createpost.value = ''
+        })
+      }
     },
     updoot: function (id) {
       this.$http.post(API + '/doot', { doot: 1, message: id }).then(response => {
