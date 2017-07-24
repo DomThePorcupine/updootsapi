@@ -247,6 +247,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 				stmt.Exec(vote.Message, clms.UserID)
 				return
 			} else if vote.Doot == 0 {
+				fmt.Println("applied downdoot")
 				stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,downdoot=1")
 				if err != nil {
 					fmt.Println("BADDDDDDDDDDD")
