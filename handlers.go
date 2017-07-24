@@ -253,8 +253,8 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 					fmt.Println("BADDDDDDDDDDD")
 					return
 				}
-				return
 				stmt.Exec(vote.Message, clms.UserID)
+				return
 			} else {
 				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
 				return
