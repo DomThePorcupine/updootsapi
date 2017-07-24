@@ -58,10 +58,24 @@
       ref="register">
     </md-dialog-prompt>
 
+    <md-dialog-prompt
+      :md-title="createpost.title"
+      :md-ok-text="createpost.ok"
+      :md-cancel-text="createpost.cancel"
+      @open="onCreateOpen()"
+      @close="onCreateClose()"
+      v-model="createpost.value"
+      ref="createpost">
+    </md-dialog-prompt>
+
     <md-snackbar :md-position="'bottom center'" ref="snackbar" :md-duration="4000">
       <span>You have succefully registered.</span>
       <md-button class="md-accent" md-theme="light-blue" @click="$refs.snackbar.close()">Close</md-button>
     </md-snackbar>
+
+    <md-button @click="$refs['createpost'].open()" class="md-fab md-fab-bottom-right md-primary">
+      <md-icon>add</md-icon>
+    </md-button>
 
   </div>
 </template>
@@ -86,6 +100,12 @@ export default {
         ok: 'Ok!',
         cancel: 'Naw',
         value: 'user@pitt.edu'
+      },
+      createpost: {
+        title: 'Enter your post',
+        ok: 'Post!',
+        cancel: 'Cancel',
+        value: ''
       }
     }
   },
@@ -112,6 +132,14 @@ export default {
     onRegClose: function () {
       this.$http.post(API + '/register', { userid: this.register.value }).then(response => {
         this.$refs.snackbar.open()
+      })
+    },
+    onCreateOpen: function () {
+      console.log('yay')
+    },
+    onCreateClose: function () {
+      this.$http.post(API + '/message', { message: this.createpost.value }).then(response => {
+        this.getMessages()
       })
     },
     updoot: function (id) {

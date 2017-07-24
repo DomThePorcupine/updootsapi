@@ -152,6 +152,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	clms, ok := req.Context().Value(Claims{}).(Claims)
 	if !ok {
 		json.NewEncoder(w).Encode(Response{"invalid id", "invalid_id"})
+		return
 	}
 	var nMessage Newmessage
 	json.NewDecoder(req.Body).Decode(&nMessage)
