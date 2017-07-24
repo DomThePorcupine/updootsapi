@@ -231,7 +231,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 		for rows.Next() {
 			rows.Scan(&count)
 		}
-		fmt.Println("here!")
+		fmt.Println(count)
 		if count == 0 {
 			// We can safely preform the action they want
 			if vote.Doot == 1 {
