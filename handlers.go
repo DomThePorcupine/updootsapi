@@ -192,6 +192,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 	// Parse the post request
 	var vote Vote
 	json.NewDecoder(req.Body).Decode(&vote)
+	fmt.Println("Message id")
 	fmt.Println(vote.Message)
 	// Check our claims
 	clms, ok := req.Context().Value(Claims{}).(Claims)
