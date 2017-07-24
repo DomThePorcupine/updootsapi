@@ -222,7 +222,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 		// We need to check and limit their votes
 		var count int
 		count = -17
-		rows, err := db.Query("select count(*) as count from votes where userid=?", clms.UserID)
+		rows, err := db.Query("select count(*) as count from votes where userid=? and message=?", clms.UserID, vote.Message)
 		if err != nil {
 			fmt.Println(err)
 			return
