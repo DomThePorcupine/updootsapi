@@ -4,12 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 )
 
 /*
@@ -20,15 +17,12 @@ func checkError(err error) {
 	fmt.Println("------------------------------------------")
 }
 
-var store = sessions.NewCookieStore([]byte("something-very-secret"))
-
-/*
-TokenRequest is a struct
-*/
-type TokenRequest struct {
-	Lat    float64 `json:"lat"`
-	Lon    float64 `json:"lon"`
-	UserID string  `json:"userid"`
+type Claims struct {
+    Expires int64  `json:"exp"`
+	Admin   bool   `json:"admin"`
+	UserID  string `json:"userid"`
+    // recommended having
+    jwt.StandardClaims
 }
 
 /*
@@ -42,44 +36,46 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	// and long
 	var tr TokenRequest
 	json.NewDecoder(req.Body).Decode(&tr)
-	fmt.Println(tr.Lat)
-	fmt.Println(tr.Lon)
-	// Make sure they gave us a lat and long
-	if tr.Lat == 0 || tr.Lon == 0 {
-		json.NewEncoder(w).Encode(Response{"Not within geofence", "invalid_location"})
+	
+	if tr.UserID == "" {
+		json.NewEncoder(w).Encode(Response{"No user id given", "invalid_id"})
 		return
 	}
-	var point string
-	point = "'POINT(" + strconv.FormatFloat(tr.Lat, 'f', 6, 64) + " " + strconv.FormatFloat(tr.Lon, 'f', 6, 64) + ")'"
-
-	rows, err := db.Query("SELECT ST_CONTAINS(fence, PointFromText(?)) as valid FROM geofences order by valid desc limit 1", point)
+	
+	rows, err := db.Query("SELECT admin from users where userid = ?", tr.UserID)
 
 	if err != nil {
 		// Internal server error
 		fmt.Println(err.Error())
 		return
 	}
+
 	var truefalse int
+	truefalse = -1
 	// Grab the value we want
 	for rows.Next() {
 		rows.Scan(&truefalse)
 	}
 
-	if truefalse == 1 {
-		// They are within atleast one geofence, yay!
-		// Now we have to check for their userid
-	} else {
-		// They are not within it so return a message telling
-		// them to go to a real school
-		json.NewEncoder(w).Encode(Response{"Not within geofence", "invalid_location"})
-		return
-	}
+	// Declare the token we will be giving them
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
-	claims["admin"] = true
-	claims["userid"] = "DJ093L98JS"
+	if truefalse == 1 {
+		// It's brian or dom let him do whatever
+		claims["admin"] = true
+	} else if truefalse == 0 {
+		// Regular user so just make sure they are not an admin
+		claims["admin"] = false
+	} else {
+		json.NewEncoder(w).Encode(Response{"No user id given", "invalid_id"})
+		return
+	}
+
+	// Set their userid
+	claims["userid"] = tr.UserID
+	// Make sure the token experies in a reasonable amount of time
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	tokenString, _ := token.SignedString(signingKey)
@@ -96,19 +92,19 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, &cookie)
 
 	w.Header().Set("Content-Type", "application/json")
-	var resp Response
-	resp.Message = "success"
-	json.NewEncoder(w).Encode(resp)
+	json.NewEncoder(w).Encode(Response{"success", "auth_successful"})
 }
 
 /*
 GetAllMessages is a function
 */
 func GetAllMessages(w http.ResponseWriter, req *http.Request) {
-	rows, err := db.Query("SELECT messages.id, messages.message, " +
-		"coalesce(sum(votes.updoot) - sum(votes.downdoot),0) " +
-		"AS updoots FROM messages LEFT JOIN votes on messages.id = votes.message " +
-		"group by messages.id order by updoots desc")
+	rows, err := db.Query("select id, messages.message, ifnull(doots,0) " + 
+							"from messages left join(select votes.message, " +
+							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
+							"as doots from votes group by votes.message) as votes " + 
+							"on messages.id = votes.message order by ifnull(doots,0) desc")
+	
 	// If we experience some kind of error
 	if err != nil {
 		checkError(err)
@@ -120,6 +116,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 	var id int
 	var mess string
 	var ups int
+	ups = -17
 	// These are the messages we will
 	// be sending back
 	var messages []Message
@@ -127,10 +124,16 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 	for rows.Next() {
 		var message Message
 		rows.Scan(&id, &mess, &ups)
+		if ups == -17 {
+			message.Updoots = 0
+		} else {
+			message.Updoots = ups
+		}
 		message.ID = id
 		message.Message = mess
-		message.Updoots = ups
+		
 		messages = append(messages, message)
+		ups = -17
 	}
 
 	// Makes sure the client sees application/json
@@ -143,52 +146,32 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 }
 
 /*
-GetMessage is a function
-*/
-func GetMessage(w http.ResponseWriter, req *http.Request) {
-
-	params := mux.Vars(req)
-	rows, err := db.Query("SELECT * FROM messages where id=?", params["id"])
-	if err != nil {
-		checkError(err)
-	}
-	var message Message
-	var id int
-	var mess string
-	var userid string
-	var ups int
-	for rows.Next() {
-		rows.Scan(&id, &mess, &userid, &ups)
-
-		message.Message = mess
-		message.Updoots = ups
-	}
-	if err != nil {
-		checkError(err)
-	}
-
-	if message.Message == "" {
-		var empty Empty
-		json.NewEncoder(w).Encode(empty)
-	} else {
-		json.NewEncoder(w).Encode(message)
-	}
-}
-
-/*
 CreateMessage is a function
 */
 func CreateMessage(w http.ResponseWriter, req *http.Request) {
+	clms, ok := req.Context().Value(Claims{}).(Claims)
+	if !ok {
+		json.NewEncoder(w).Encode(Response{"invalid id", "invalid_id"})
+	}
 	var nMessage Newmessage
 	json.NewDecoder(req.Body).Decode(&nMessage)
-	// declare a new message
-	// All new messages will have 0 updoots to start
-	stmt, err := db.Prepare("INSERT messages SET message=?,userid=?,updoots=0")
+	// For now simply make sure we only keep 100 messages
+	dl, err := db.Prepare(	"delete message from messages as message " + 
+							"join(select created from messages order by created desc limit 1 offset 98)" + 
+							" ctd on message.created < ctd.created;")
 	if err != nil {
 		return
 	}
-	fmt.Println(nMessage.Message)
-	res, err := stmt.Exec(nMessage.Message, "Y87YUHG989839RW09U98")
+	dl.Exec()
+	// declare a new message
+	// All new messages will have 0 updoots to start
+	stmt, err := db.Prepare("INSERT messages SET message=?,userid=?")
+	if err != nil {
+		return
+	}
+	
+	res, err := stmt.Exec(nMessage.Message, clms.UserID)
+
 	if err != nil {
 		checkError(err)
 	}
@@ -198,4 +181,104 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	}
 	// return the newly created object
 	json.NewEncoder(w).Encode(id)
+}
+
+/*
+This is a function
+*/
+
+func DootOnMessage(w http.ResponseWriter, req *http.Request) {
+	// Parse the post request
+	var vote Vote
+	json.NewDecoder(req.Body).Decode(&vote)
+	// Check our claims
+	clms, ok := req.Context().Value(Claims{}).(Claims)
+	if !ok {
+		json.NewEncoder(w).Encode(Response{"invalid id", "invalid_id"})
+		return
+	}
+	if clms.Admin {
+		// They can upvote as much as they want
+		if vote.Doot == 1 {
+			stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,updoot=1")
+			if err != nil {
+				return
+			}
+			stmt.Exec(vote.Message, clms.UserID)
+		} else if vote.Doot == 0 {
+			stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,downdoot=1")
+			if err != nil {
+				return
+			}
+			stmt.Exec(vote.Message, clms.UserID)
+		} else {
+			json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
+			return
+		}
+	} else {
+		// We need to check and limit their votes
+		var count int
+		rows, err := db.Query("select count(*) as count from votes where userid=?", clms.UserID)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		
+		for rows.Next() {
+			rows.Scan(&count)
+		}
+
+		if count == 0 {
+			// We can safely preform the action they want
+			if vote.Doot == 1 {
+				stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,updoot=1")
+				if err != nil {
+					return
+				}
+				stmt.Exec(vote.Message, clms.UserID)
+			} else if vote.Doot == 0 {
+				stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,downdoot=1")
+				if err != nil {
+					return
+				}
+				stmt.Exec(vote.Message, clms.UserID)
+			} else {
+				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
+				return
+			}
+		} else {
+			// otherwise we simply update the entry that already exists
+			if vote.Doot == 1 {
+				stmt, err := db.Prepare("UPDATE votes SET updoot=1, downdoot=0 where message=? and userid=?")
+				if err != nil {
+					return
+				}
+				stmt.Exec(vote.Message, clms.UserID)
+			} else if vote.Doot == 0 {
+				stmt, err := db.Prepare("UPDATE votes SET updoot=0, downdoot=1 where message=? and userid=?")
+				if err != nil {
+					return
+				}
+				stmt.Exec(vote.Message, clms.UserID)
+			} else {
+				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
+				return
+			}
+		}
+	}
+}
+
+func Register(w http.ResponseWriter, req *http.Request) {
+	var tr TokenRequest
+
+	json.NewDecoder(req.Body).Decode(&tr)
+
+	if tr.UserID == "" {
+		return
+	}
+	stmt, err := db.Prepare("INSERT users SET userid=?")
+	if err != nil {
+		return
+	}
+	stmt.Exec(tr.UserID)
 }

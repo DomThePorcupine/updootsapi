@@ -1,15 +1,18 @@
 <template>
   <div class="home">
     <div class="phone-viewport">
+      
       <md-toolbar>
         <md-button class="md-icon-button">
           <md-icon>menu</md-icon>
         </md-button>
 
         <h2 class="md-title" style="flex: 1">updoots</h2>
-
-        <md-button class="md-icon-button">
-          <md-icon>favorite</md-icon>
+        <md-button @click="$refs['auth'].open()" class="md-icon-button">
+          <md-icon>account_box</md-icon>
+        </md-button>
+        <md-button @click="$refs['register'].open()" class="md-icon-button">
+          <md-icon>person_add</md-icon>
         </md-button>
       </md-toolbar>
       
@@ -42,8 +45,24 @@
       @open="onOpen()"
       @close="onClose()"
       v-model="prompt.value"
-      ref="phoneauth">
+      ref="auth">
     </md-dialog-prompt>
+
+    <md-dialog-prompt
+      :md-title="register.title"
+      :md-ok-text="register.ok"
+      :md-cancel-text="register.cancel"
+      @open="onRegOpen()"
+      @close="onRegClose()"
+      v-model="register.value"
+      ref="register">
+    </md-dialog-prompt>
+
+    <md-snackbar :md-position="'bottom center'" ref="snackbar" :md-duration="4000">
+      <span>You have succefully registered.</span>
+      <md-button class="md-accent" md-theme="light-blue" @click="$refs.snackbar.close()">Close</md-button>
+    </md-snackbar>
+
   </div>
 </template>
 
@@ -57,29 +76,29 @@ export default {
     return {
       posts: [],
       prompt: {
-        title: 'Enter your phone number:',
+        title: 'Enter your userid:',
         ok: 'Ok!',
         cancel: 'Naw',
-        value: '4128675309'
+        value: 'user'
+      },
+      register: {
+        title: 'Enter a new userid',
+        ok: 'Ok!',
+        cancel: 'Naw',
+        value: 'user@pitt.edu'
       }
     }
   },
   methods: {
     getMessages: function () {
       this.$http.get(API + '/message').then(response => {
-        this.posts = response.body
+        this.posts = JSON.parse(response.body)
       }, response => {
-        // We need to get a token first
-        // pretend we got the response
-        this.posts = [{'id': 4, 'message': 'dae go to Ascend?', 'updoots': 2},
-                        { 'id': 2, 'message': 'lmao', 'updoots': 1 },
-                        { 'id': 3, 'message': 'this is a super cool app', 'updoots': 0 },
-                        { 'id': 1, 'message': 'reply chug', 'updoots': 0 }]
-        // this.$refs['phoneauth'].open()
+        this.$refs['auth'].open()
       })
     },
-    onClose: function (type) {
-      this.$http.post(API + '/token', { phone: this.prompt.value }).then(response => {
+    onClose: function () {
+      this.$http.post(API + '/token', { userid: this.prompt.value }).then(response => {
         // We should have gotten a token
         this.getMessages()
       })
@@ -87,36 +106,25 @@ export default {
     onOpen: function () {
       console.log('yay')
     },
+    onRegOpen: function () {
+      console.log('yay')
+    },
+    onRegClose: function () {
+      this.$http.post(API + '/register', { userid: this.register.value }).then(response => {
+        this.$refs.snackbar.open()
+      })
+    },
     updoot: function (id) {
-      this.posts.forEach(function (element) {
-        if (element.id === id) {
-          element.updoots += 1
-        }
-      }, this)
-        /*
-      this.$http.get(API + '/message/' + id + '/updoot').then(response => {
-        this.posts.forEach(function(element) {
-          if(element.id == id) {
-            element.updoots += 1
-          }
-        }, this)
-      }) */
-      this.reorder()
+      this.$http.post(API + '/doot', { doot: 1, message: id }).then(response => {
+        // Here
+        this.getMessages()
+      })
     },
     downdoot: function (id) {
-      this.posts.forEach(function (element) {
-        if (element.id === id) {
-          element.updoots -= 1
-        }
-      }, this)
-      this.reorder()
-    },
-    reorder: function () {
-      var temp = this.posts.slice(0)
-      temp.sort(function (a, b) {
-        return b.updoots - a.updoots
+      this.$http.post(API + '/doot', { doot: 0, message: id }).then(response => {
+        // Here
+        this.getMessages()
       })
-      this.posts = temp
     }
   },
   created: function () {
@@ -143,12 +151,5 @@ li {
 
 a {
   color: #42b983;
-}
-.posts {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-.post {
-  
 }
 </style>

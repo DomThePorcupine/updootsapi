@@ -20,11 +20,11 @@
 
 9. Paste the following into the SQL shell:
     ```
-    create table `messages` (
+    create table `posts` (
         `id` INT NOT NULL AUTO_INCREMENT,
         `message` VARCHAR(250),
         `userid` VARCHAR(20),
-        `updoots` INT,
+        `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`)
     );
     then:
@@ -34,11 +34,10 @@
         `updoot` TINYINT(1) NOT NULL default 0, 
         `downdoot` TINYINT(1) NOT NULL default 0
     );
-    create table `geofences` ( 
-        `id` INT NOT NULL AUTO_INCREMENT,
-        `name` VARCHAR(80), 
-        `fence` GEOMETRY, 
-        PRIMARY KEY (id)
+    then:
+    create table `users` (
+        `userid` VARCHAR(20) NOT NULL UNIQUE,
+        `admin` TINYINT(1) NOT NULL default 0
     );
     ```
 

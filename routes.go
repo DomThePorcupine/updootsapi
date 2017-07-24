@@ -30,6 +30,12 @@ var protectedroutes = Routes{
 		"/message",
 		CreateMessage,
 	},
+	Route{
+		"DootOnMessage",
+		"POST",
+		"/doot",
+		DootOnMessage,
+	},
 }
 
 var routes = Routes{
@@ -38,5 +44,11 @@ var routes = Routes{
 		"POST",
 		"/token",
 		GetToken,
+	},
+	Route{
+		"Register",
+		"POST",
+		"/register",
+		Register,
 	},
 }
