@@ -206,12 +206,14 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 			stmt.Exec(vote.Message, clms.UserID)
+			return
 		} else if vote.Doot == 0 {
 			stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,downdoot=1")
 			if err != nil {
 				return
 			}
 			stmt.Exec(vote.Message, clms.UserID)
+			return
 		} else {
 			json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
 			return
@@ -237,11 +239,13 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 					return
 				}
 				stmt.Exec(vote.Message, clms.UserID)
+				return
 			} else if vote.Doot == 0 {
 				stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,downdoot=1")
 				if err != nil {
 					return
 				}
+				return
 				stmt.Exec(vote.Message, clms.UserID)
 			} else {
 				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
@@ -255,12 +259,14 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 					return
 				}
 				stmt.Exec(vote.Message, clms.UserID)
+				return
 			} else if vote.Doot == 0 {
 				stmt, err := db.Prepare("UPDATE votes SET updoot=0, downdoot=1 where message=? and userid=?")
 				if err != nil {
 					return
 				}
 				stmt.Exec(vote.Message, clms.UserID)
+				return
 			} else {
 				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
 				return
