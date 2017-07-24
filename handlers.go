@@ -192,6 +192,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 	// Parse the post request
 	var vote Vote
 	json.NewDecoder(req.Body).Decode(&vote)
+	fmt.Println(vote.Message)
 	// Check our claims
 	clms, ok := req.Context().Value(Claims{}).(Claims)
 	if !ok {
@@ -231,7 +232,9 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 		for rows.Next() {
 			rows.Scan(&count)
 		}
+
 		fmt.Println(count)
+		
 		if count == 0 {
 			// We can safely preform the action they want
 			if vote.Doot == 1 {
