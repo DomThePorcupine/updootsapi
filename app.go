@@ -49,5 +49,5 @@ func main() {
 
 	handler := c.Handler(router)
         
-	log.Fatal(http.ListenAndServe(":3001", handler)
+	log.Fatal(http.ListenAndServe(":3001", handler))
 }
