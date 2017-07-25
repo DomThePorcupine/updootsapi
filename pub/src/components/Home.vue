@@ -40,6 +40,7 @@
           </md-list-item>
         </md-list>
       </div>
+
     </div>
     <!-- this holds our dialog box for forcing auth -->
     <md-dialog-prompt
@@ -78,7 +79,9 @@
     </md-snackbar>
 
     
-
+      <md-button @click="$refs['createpost'].open()" class="md-fab dom-float md-fab-bottom-right">
+        <md-icon>add</md-icon>
+      </md-button>
   </div>
 </template>
 
@@ -206,6 +209,11 @@ a {
     position: absolute;
     bottom: -20px;
     left: 16px;
+  }
+  .dom-float {
+    position:fixed;
+    right:0;
+    bottom:0;
   }
 
   .md-title {
