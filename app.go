@@ -41,7 +41,7 @@ func main() {
 	// Make sure to allow all requests
 
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:8100/", "http://127.0.0.1:8100/","http://localhost:8080/", "http://127.0.0.1:8080/", "http://localhost:3000/", "https://updoot.us"},
+		AllowedOrigins: []string{"http://localhost:8100/", "*","http://127.0.0.1:8100/","http://localhost:8080", "http://127.0.0.1:8080/", "http://localhost:3000/", "https://updoot.us"},
 		AllowCredentials: true,
 		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
 		AllowedHeaders: []string{"X-Requested-With", "Accept", "Origin"," Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"},
