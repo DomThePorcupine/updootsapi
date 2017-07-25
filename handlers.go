@@ -133,7 +133,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 		}
 		message.ID = id
 		fmt.Println(mess)
-		message.Message = string(mess)
+		message.Message = string(mess[:250])
 		
 		messages = append(messages, message)
 		ups = -17
