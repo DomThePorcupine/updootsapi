@@ -178,10 +178,8 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	id, err := res.LastInsertId()
-	if err != nil {
-		checkError(err)
-	}
+	var id int
+	id = 7
 	// return the newly created object
 	json.NewEncoder(w).Encode(id)
 }
