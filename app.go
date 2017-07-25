@@ -30,7 +30,7 @@ func main() {
 	fmt.Println("+----------------------+")
 
 	// Note that here we must use a strict = rather than :=
-	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb")
+	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb?charset=utf8mb4")
 	if err != nil {
 		return
 	}
