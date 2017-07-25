@@ -1,22 +1,24 @@
 <template>
   <div class="home">
     <div class="phone-viewport">
-      <md-button @click="$refs['createpost'].open()" class="md-fab md-fab-bottom-right md-primary">
-        <md-icon>add</md-icon>
-      </md-button>
-      <md-toolbar>
-        <md-button class="md-icon-button">
-          <md-icon>menu</md-icon>
-        </md-button>
-
-        <h2 class="md-title" style="flex: 1">updoots</h2>
-        <md-button @click="$refs['auth'].open()" class="md-icon-button">
+      <md-whiteframe md-tag="md-toolbar" md-elevation="2" md-theme="light-blue" class="md-small">
+        <div class="md-toolbar-container">
+          <md-button class="md-icon-button" @click="$refs.sidenav.toggle()">
+            <md-icon>menu</md-icon>
+          </md-button>
+          <h2>updoots</h2>
+          <span style="flex: 1"></span>
+          
+          <md-button @click="$refs['auth'].open()" class="md-icon-button">
           <md-icon>account_box</md-icon>
         </md-button>
         <md-button @click="$refs['register'].open()" class="md-icon-button">
           <md-icon>person_add</md-icon>
         </md-button>
-      </md-toolbar>
+        </div>
+      </md-whiteframe>
+
+     
       
       <div class="posts" >
         <md-list>
@@ -118,7 +120,15 @@ export default {
       })
     },
     onClose: function () {
-      this.$http.post(API + '/token', { userid: this.prompt.value }).then(response => {
+      this.$http.post(API + '/token', JSON.stringify({ userid: this.prompt.value }), {
+        headers: {
+          'Content-Type': 'text/plain',
+          'Accept': 'application/json'
+        },
+        options: {
+          'withCredentials': true
+        }
+      }).then(response => {
         // We should have gotten a token
         this.getMessages()
       })
@@ -182,5 +192,50 @@ li {
 
 a {
   color: #42b983;
+}
+.complete-example {
+  height: 540px;
+  display: flex;
+  flex-flow: column;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+
+  .md-fab {
+    margin: 0;
+    position: absolute;
+    bottom: -20px;
+    left: 16px;
+  }
+
+  .md-title {
+    color: #fff;
+  }
+
+  .md-list {
+    overflow: auto;
+  }
+
+  .md-list-action .md-icon {
+    color: rgba(#000, .26);
+  }
+
+  .md-avatar-icon .md-icon {
+    color: #fff !important;
+  }
+
+  .md-sidenav .md-list-text-container > :nth-child(2) {
+    color: rgba(#fff, .54);
+  }
+
+  .md-account-header {
+    .md-list-item:hover .md-button:hover {
+      background-color: inherit;
+    }
+
+    .md-avatar-list .md-list-item-container:hover {
+      background: none !important;
+    }
+  }
 }
 </style>

@@ -157,6 +157,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	}
 	var nMessage Newmessage
 	json.NewDecoder(req.Body).Decode(&nMessage)
+	fmt.Println(nMessage.Message)
 	// For now simply make sure we only keep 100 messages
 	dl, err := db.Prepare(	"delete message from messages as message " + 
 							"join(select created from messages order by created desc limit 1 offset 98)" + 
