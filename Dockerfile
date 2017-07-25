@@ -17,6 +17,7 @@ RUN go get github.com/gorilla/handlers
 RUN go get github.com/gorilla/sessions
 RUN go get golang.org/x/crypto/bcrypt
 RUN go get github.com/codegangsta/gin
+RUN go get github.com/rs/cors
 
 # Build our app
 WORKDIR /app/src/github.com/domtheporcupine/updoots
