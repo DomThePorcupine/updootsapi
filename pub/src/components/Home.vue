@@ -1,7 +1,9 @@
 <template>
   <div class="home">
     <div class="phone-viewport">
-      
+      <md-button @click="$refs['createpost'].open()" class="md-fab md-fab-bottom-right md-primary">
+        <md-icon>add</md-icon>
+      </md-button>
       <md-toolbar>
         <md-button class="md-icon-button">
           <md-icon>menu</md-icon>
@@ -73,9 +75,7 @@
       <md-button class="md-accent" md-theme="light-blue" @click="$refs.snackbar.close()">Close</md-button>
     </md-snackbar>
 
-    <md-button @click="$refs['createpost'].open()" class="md-fab md-fab-bottom-right md-primary">
-      <md-icon>add</md-icon>
-    </md-button>
+    
 
   </div>
 </template>
