@@ -184,10 +184,8 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		checkError(err)
 	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		checkError(err)
-	}
+	//id, err := res.LastInsertId()
+	
 	// return the newly created object
 	json.NewEncoder(w).Encode(Empty{})
 }
