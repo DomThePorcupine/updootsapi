@@ -179,7 +179,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	
-	res, err := stmt.Exec(nMessage.Message, clms.UserID)
+	_, err := stmt.Exec(nMessage.Message, clms.UserID)
 
 	if err != nil {
 		checkError(err)
