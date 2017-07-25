@@ -177,7 +177,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		return
 	}
-
+	fmt.Println(stmt)
 	var id int
 	id = 7
 	// return the newly created object
