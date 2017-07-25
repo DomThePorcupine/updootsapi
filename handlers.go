@@ -32,7 +32,7 @@ to people defining what they can and cannot do
 */
 func GetToken(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Credentials", true)
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	// First we should parse to see if they are within
 	// the bounds of the geofence or even gave us a lat
 	// and long
