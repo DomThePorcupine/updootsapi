@@ -21,7 +21,7 @@ Message is a struct
 */
 type Message struct {
 	ID      int    `json:"id,omitempty"`
-	Message string `json:"message,omitempty"`
+	Message []byte `json:"message,omitempty"`
 	UserID  string `json:"userid,omitempty"`
 	Updoots int    `json:"updoots"`
 }
