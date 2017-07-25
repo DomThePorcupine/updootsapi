@@ -173,16 +173,11 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	dl.Exec()
 	// declare a new message
 	// All new messages will have 0 updoots to start
-	stmt, err := db.Prepare("INSERT messages SET message=?,userid=?")
+	stmt, err := db.Querey("INSERT messages SET message=?,userid=?", nMessage.Message, clms.UserID)
 	if err != nil {
 		return
 	}
-	
-	res, err := stmt.Exec(nMessage.Message, clms.UserID)
 
-	if err != nil {
-		checkError(err)
-	}
 	id, err := res.LastInsertId()
 	if err != nil {
 		checkError(err)
