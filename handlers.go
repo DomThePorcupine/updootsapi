@@ -173,13 +173,20 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	dl.Exec()
 	// declare a new message
 	// All new messages will have 0 updoots to start
-	stmt, err := db.Query("INSERT messages SET message=?,userid=?", nMessage.Message, clms.UserID)
+	stmt, err := db.Querey("INSERT into messages values( ? , ?)")
 	if err != nil {
 		return
 	}
-	fmt.Println(stmt)
-	var id int
-	id = 7
+	
+	res, err := stmt.Exec(nMessage.Message, clms.UserID)
+
+	if err != nil {
+		checkError(err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		checkError(err)
+	}
 	// return the newly created object
 	json.NewEncoder(w).Encode(id)
 }
