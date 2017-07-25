@@ -8,7 +8,6 @@ import (
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/handlers"
 	"github.com/rs/cors"
 )
 
