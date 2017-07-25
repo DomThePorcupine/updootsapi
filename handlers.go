@@ -173,7 +173,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	dl.Exec()
 	// declare a new message
 	// All new messages will have 0 updoots to start
-	stmt, err := db.Querey("INSERT into messages values( ? , ?)")
+	stmt, err := db.Prepare("INSERT into messages values( ? , ?)")
 	if err != nil {
 		return
 	}
