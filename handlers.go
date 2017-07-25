@@ -116,7 +116,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var id int
-	var mess []byte
+	var mess string
 	var ups int
 	ups = -17
 	// These are the messages we will
