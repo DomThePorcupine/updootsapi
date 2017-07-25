@@ -132,7 +132,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 			message.Updoots = ups
 		}
 		message.ID = id
-		fmt.Println(mess)
+		//fmt.Println(mess)
 		message.Message = mess
 		
 		messages = append(messages, message)
@@ -175,6 +175,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	// All new messages will have 0 updoots to start
 	stmt, err := db.Prepare("INSERT into messages values( ? , ?)")
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	
@@ -188,7 +189,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 		checkError(err)
 	}
 	// return the newly created object
-	json.NewEncoder(w).Encode(id)
+	json.NewEncoder(w).Encode(Empty{})
 }
 
 /*
