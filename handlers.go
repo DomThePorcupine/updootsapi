@@ -94,7 +94,7 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, &cookie)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Response{"success", "auth_successful"})
+	json.NewEncoder(w).Encode(Response{tokenString, "auth_successful"})
 }
 
 /*
