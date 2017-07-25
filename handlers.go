@@ -161,6 +161,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 	json.NewDecoder(req.Body).Decode(&nMessage)
 	fmt.Println(string(nMessage.Message))
 	fmt.Println(utf8.ValidString(nMessage.Message))
+
 	// For now simply make sure we only keep 100 messages
 	dl, err := db.Prepare(	"delete message from messages as message " + 
 							"join(select created from messages order by created desc limit 1 offset 98)" + 
@@ -176,7 +177,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	
-	res, err := stmt.Exec(nMessage.Message, clms.UserID)
+	res, err := stmt.Exec(string(nMessage.Message[:250]), clms.UserID)
 
 	if err != nil {
 		checkError(err)
