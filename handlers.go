@@ -157,8 +157,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(w).Encode(Response{"invalid id", "invalid_id"})
 		return
 	}
-	lol, err := json.Marshal(req.Body)
-	fmt.Println(lol)
+	
 	var nMessage Newmessage
 	json.NewDecoder(req.Body).Decode(&nMessage)
 	fmt.Println(string(nMessage.Message))
@@ -179,7 +178,7 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	
-	res, err := stmt.Exec(string(nMessage.Message[:]), clms.UserID)
+	res, err := stmt.Exec(nMessage.Message, clms.UserID)
 
 	if err != nil {
 		checkError(err)

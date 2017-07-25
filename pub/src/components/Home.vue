@@ -149,7 +149,7 @@ export default {
     },
     onCreateClose: function () {
       if (this.createpost.value !== '') {
-        this.$http.post(API + '/message', { message: this.createpost.value }).then(response => {
+        this.$http.post(API + '/message', { message: this.createpost.value.toString('utf8') }).then(response => {
           this.getMessages()
           this.createpost.value = ''
         })
