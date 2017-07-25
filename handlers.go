@@ -116,7 +116,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var id int
-	var mess string
+	var mess []byte
 	var ups int
 	ups = -17
 	// These are the messages we will
@@ -133,7 +133,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 		}
 		message.ID = id
 		fmt.Println(mess)
-		message.Message = string(mess[:250])
+		message.Message = mess
 		
 		messages = append(messages, message)
 		ups = -17
