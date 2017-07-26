@@ -105,7 +105,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 							"from messages left join(select votes.message, " +
 							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
 							"as doots from votes group by votes.message) as votes " + 
-							"on messages.id = votes.message having totalvotes > -3 order by ifnull(doots,0) desc")
+							"on messages.id = votes.message having totalvotes > -3 order by ifnull(doots,0) desc, messages.created desc")
 	
 	// If we experience some kind of error
 	if err != nil {
