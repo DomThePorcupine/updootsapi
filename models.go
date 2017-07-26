@@ -1,6 +1,6 @@
 package main
 
-type VoteResponse {
+type VoteResponse struct {
 	Message string	`json:message,omitempty`
 	Updoots int		`json:updoots,omitempty`
 }
