@@ -294,6 +294,10 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 	}
 
 	rows, err := db.Query("select ifnull((sum(votes.updoot) - sum(votes.downdoot)),0) as updoots from votes where votes.message=?", vote.Message)
+	if err != nil {
+		fmt.Println("BADDDDDDDDDDD")
+		return
+	}
 	var count int
 	for rows.Next() {
 		rows.Scan(&count)
