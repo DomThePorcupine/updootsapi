@@ -1,0 +1,12 @@
+select distinct messages.id, distinct messages.message, messages.created, ifnull(doots,0) as totalvotes, votes.updoot, 
+votes.downdoot from messages left join(select votes.message, 
+cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) as doots from votes group by 
+votes.message) as votes1 on messages.id = votes1.message left join votes on votes.message = messages.id 
+where (votes.userid="dom" or messages.id not in (select messages.id from messages left join votes on messages.id=votes.message where votes.userid="dom"))
+having totalvotes > -3 order by ifnull(doots,0) desc, created desc;
+
+select id, messages.message, ifnull(doots,0) as totalvotes from messages left 
+join(select votes.message, cast((sum(votes.updoot) - sum(votes.downdoot)) as signed)  
+as doots from votes group by votes.message) as votes on messages.id = votes.message
+left join votes a on a.message = messages.id where a.userid="dom" or a.updoot is null 
+having totalvotes > -3 order by ifnull(doots,0) desc, messages.created desc

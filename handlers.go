@@ -292,6 +292,15 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
+
+	rows, err := db.Query("select ifnull((sum(votes.updoot) - sum(votes.downdoot)),0) as updoots from votes where votes.message=?", vote.Message)
+	var count int
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+
+	json.NewEncoder(w).Encode(VoteResponse{"success", count})
+	return
 }
 
 func Register(w http.ResponseWriter, req *http.Request) {
