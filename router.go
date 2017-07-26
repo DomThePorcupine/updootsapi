@@ -28,7 +28,7 @@ func APIRouter() *mux.Router {
 	}
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./pub/dist")))
-	router.PathPrefix("/releases").Handler(http.FileServer(http.Dir("./releases")))
+	router.PathPrefix("/release").Handler(http.FileServer(http.Dir("./releases")))
 	http.Handle("/", router)
 
 	return router
