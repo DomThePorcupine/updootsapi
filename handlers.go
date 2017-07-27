@@ -343,6 +343,9 @@ func Register(w http.ResponseWriter, req *http.Request) {
 	if tr.UserID == "" {
 		return
 	}
+	
+	fmt.Println(tr.UserID)
+
 	stmt, err := db.Prepare("INSERT into users (userid) values(?)")
 	if err != nil {
 		json.NewEncoder(w).Encode(Response{"something bad happened first", "invalid_action"})
