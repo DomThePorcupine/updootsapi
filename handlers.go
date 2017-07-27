@@ -338,9 +338,16 @@ func Register(w http.ResponseWriter, req *http.Request) {
 	if tr.UserID == "" {
 		return
 	}
-	stmt, err := db.Prepare("INSERT users SET userid=?")
+	stmt, err := db.Prepare("INSERT into users (userid) values(?)")
 	if err != nil {
+		json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
 		return
 	}
-	stmt.Exec(tr.UserID)
+	_, err = stmt.Exec(tr.UserID)
+
+	if err != nil {
+		json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
+		return
+	}
+
 }
