@@ -63,7 +63,7 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(w).Encode(Response{"No user id given", "invalid_id"})
 		return
 	}
-	
+
 	// Declare the token we will be giving them
 	token := jwt.New(jwt.SigningMethodHS256)
 
@@ -345,7 +345,7 @@ func Register(w http.ResponseWriter, req *http.Request) {
 	}
 	stmt, err := db.Prepare("INSERT into users (userid) values(?)")
 	if err != nil {
-		json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
+		json.NewEncoder(w).Encode(Response{"something bad happened first", "invalid_action"})
 		return
 	}
 	_, err = stmt.Exec(tr.UserID)
