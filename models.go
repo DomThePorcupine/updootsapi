@@ -30,6 +30,16 @@ type Message struct {
 	UserID  string `json:"userid,omitempty"`
 	Updoots int    `json:"updoots"`
 }
+/*
+MessageResponse is a struct
+*/
+type MessageResponse struct {
+	ID      int    `json:"id,omitempty"`
+	Message string `json:"message,omitempty"`
+	UserID  string `json:"userid,omitempty"`
+	Updoots int    `json:"updoots"`
+	Vote	int	   `json:"vote"`
+}
 
 /*
 Newmessage is a struct

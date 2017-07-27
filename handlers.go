@@ -101,12 +101,37 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 GetAllMessages is a function
 */
 func GetAllMessages(w http.ResponseWriter, req *http.Request) {
+	// Get our claims we will need the user id
+	clms, ok := req.Context().Value(Claims{}).(Claims)
+	if !ok {
+		json.NewEncoder(w).Encode(Response{"invalid id", "invalid_id"})
+		return
+	}
+
 	rows, err := db.Query("select id, messages.message, ifnull(doots,0) as totalvotes " + 
 							"from messages left join(select votes.message, " +
 							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
 							"as doots from votes group by votes.message) as votes " + 
 							"on messages.id = votes.message having totalvotes > -3 order by ifnull(doots,0) desc, messages.created desc")
-	
+	// Need to also get what we voted on for visual ques
+	votedrows, err := db.Query("select updoot, downdoot, message from votes where userid=?", clms.UserID)
+
+	// Create a hash this will be usefull later
+	votes := make(map[int]int)
+	var up int
+	var down int
+	var id int
+	for votedrows.Next() {
+		votedrows.Scan(&up, &down, &id)
+		if(up == 1) {
+			votes[id] = 1
+		} else if(down == 1) {
+			votes[id] = -1
+		}
+		// In go if an int doesn't
+		// exist in a map it is simply zerp
+		// so we can just let that do the hard work
+	}
 	// If we experience some kind of error
 	if err != nil {
 		checkError(err)
@@ -115,16 +140,16 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var id int
 	var mess string
 	var ups int
 	ups = -17
 	// These are the messages we will
 	// be sending back
-	var messages []Message
+	var messages []MessageResponse
 	//fmt.Println(rows)
 	for rows.Next() {
-		var message Message
+		var message MessageResponse
+
 		rows.Scan(&id, &mess, &ups)
 		if ups == -17 {
 			message.Updoots = 0
@@ -134,7 +159,7 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 		message.ID = id
 		//fmt.Println(mess)
 		message.Message = mess
-		
+		message.Vote = votes[id]
 		messages = append(messages, message)
 		ups = -17
 	}
@@ -142,8 +167,9 @@ func GetAllMessages(w http.ResponseWriter, req *http.Request) {
 	// Makes sure the client sees application/json
 	w.WriteHeader(http.StatusOK)
 	if messages == nil {
-		messages = make([]Message, 0)
+		messages = make([]MessageResponse, 0)
 	}
+
 	// else we should have our rows
 	json.NewEncoder(w).Encode(messages)
 }
