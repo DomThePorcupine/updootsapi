@@ -53,10 +53,11 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var truefalse int
+	var uid string
 	truefalse = -1
 	// Grab the value we want
 	for rows.Next() {
-		rows.Scan(&truefalse)
+		rows.Scan(&truefalse, &uid)
 	}
 
 	if(truefalse == -1) {
@@ -81,7 +82,7 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Set their userid
-	claims["userid"] = tr.UserID
+	claims["userid"] = uid
 	// Make sure the token experies in a reasonable amount of time
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
