@@ -44,7 +44,7 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	
-	rows, err := db.Query("SELECT admin from users where userid = ?", tr.UserID)
+	rows, err := db.Query("SELECT admin, userid from users where userid = ?", tr.UserID)
 
 	if err != nil {
 		// Internal server error
@@ -59,6 +59,11 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 		rows.Scan(&truefalse)
 	}
 
+	if(truefalse == -1) {
+		json.NewEncoder(w).Encode(Response{"No user id given", "invalid_id"})
+		return
+	}
+	
 	// Declare the token we will be giving them
 	token := jwt.New(jwt.SigningMethodHS256)
 
