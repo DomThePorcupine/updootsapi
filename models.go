@@ -1,5 +1,5 @@
 package main
-
+import "time"
 type VoteResponse struct {
 	Message string	`json:message,omitempty`
 	Updoots int		`json:updoots,omitempty`
@@ -39,6 +39,7 @@ type MessageResponse struct {
 	UserID  string `json:"userid,omitempty"`
 	Updoots int    `json:"updoots"`
 	Vote	int	   `json:"vote"`
+	Time	time.Time `json:"time"`
 }
 
 /*

@@ -114,7 +114,7 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rows, err := db.Query("select id, messages.message, ifnull(doots,0) as totalvotes " + 
+	rows, err := db.Query("select messages.created, id, messages.message, ifnull(doots,0) as totalvotes " + 
 							"from messages left join(select votes.message, " +
 							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
 							"as doots from votes group by votes.message) as votes " + 
@@ -128,6 +128,7 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 	var up int
 	var down int
 	var id int
+	
 	for votedrows.Next() {
 		votedrows.Scan(&up, &down, &id)
 		if(up == 1) {
@@ -149,6 +150,7 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 
 	var mess string
 	var ups int
+	var tim time.Time
 	ups = -17
 	// These are the messages we will
 	// be sending back
@@ -157,7 +159,7 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 	for rows.Next() {
 		var message MessageResponse
 
-		rows.Scan(&id, &mess, &ups)
+		rows.Scan(&tim, &id, &mess, &ups)
 		if ups == -17 {
 			message.Updoots = 0
 		} else {
@@ -167,6 +169,7 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 		//fmt.Println(mess)
 		message.Message = mess
 		message.Vote = votes[id]
+		message.Time = tim
 		messages = append(messages, message)
 		ups = -17
 	}
@@ -192,7 +195,7 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rows, err := db.Query("select id, messages.message, ifnull(doots,0) as totalvotes " + 
+	rows, err := db.Query("select messages.created, id, messages.message, ifnull(doots,0) as totalvotes " + 
 							"from messages left join(select votes.message, " +
 							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
 							"as doots from votes group by votes.message) as votes " + 
@@ -206,6 +209,7 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 	var up int
 	var down int
 	var id int
+	
 	for votedrows.Next() {
 		votedrows.Scan(&up, &down, &id)
 		if(up == 1) {
@@ -227,6 +231,7 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 
 	var mess string
 	var ups int
+	var tim time.Time
 	ups = -17
 	// These are the messages we will
 	// be sending back
@@ -235,7 +240,7 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 	for rows.Next() {
 		var message MessageResponse
 
-		rows.Scan(&id, &mess, &ups)
+		rows.Scan(&tim, &id, &mess, &ups)
 		if ups == -17 {
 			message.Updoots = 0
 		} else {
@@ -245,6 +250,7 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 		//fmt.Println(mess)
 		message.Message = mess
 		message.Vote = votes[id]
+		message.Time = tim
 		messages = append(messages, message)
 		ups = -17
 	}
