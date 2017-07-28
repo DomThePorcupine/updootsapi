@@ -114,7 +114,7 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rows, err := db.Query("select messages.created, id, messages.message, ifnull(doots,0) as totalvotes " + 
+	rows, err := db.Query("select id, messages.message, ifnull(doots,0) as totalvotes " + 
 							"from messages left join(select votes.message, " +
 							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
 							"as doots from votes group by votes.message) as votes " + 
@@ -192,7 +192,7 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rows, err := db.Query("select messages.created, id, messages.message, ifnull(doots,0) as totalvotes " + 
+	rows, err := db.Query("select id, messages.message, ifnull(doots,0) as totalvotes " + 
 							"from messages left join(select votes.message, " +
 							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
 							"as doots from votes group by votes.message) as votes " + 
