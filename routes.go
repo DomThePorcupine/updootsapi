@@ -19,10 +19,16 @@ type Routes []Route
 
 var protectedroutes = Routes{
 	Route{
-		"GetMessages",
+		"GetMessagesNew",
 		"GET",
-		"/message",
-		GetAllMessages,
+		"/message/new",
+		GetAllMessagesNew,
+	},
+	Route{
+		"GetMessagesTop",
+		"GET",
+		"/message/top",
+		GetAllMessagesTop,
 	},
 	Route{
 		"CreateMessage",
