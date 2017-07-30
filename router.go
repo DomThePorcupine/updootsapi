@@ -27,8 +27,8 @@ func APIRouter() *mux.Router {
 		router.Methods(route.Method).Path("/api/v1" + route.Pattern).Name(route.Name).HandlerFunc(validate(handler))
 	}
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./pub/dist")))
-	router.PathPrefix("/release").Handler(http.FileServer(http.Dir("./releases")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./pub/")))
+	
 	http.Handle("/", router)
 
 	return router

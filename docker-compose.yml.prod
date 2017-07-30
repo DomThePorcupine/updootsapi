@@ -4,8 +4,6 @@ updoots_web:
     - updoots_db
   ports:
     - "3000:3000"
-  volumes:
-    - .:/app/src/github.com/domtheporcupine/updoots
 updoots_db:
   image: mysql
   environment:
