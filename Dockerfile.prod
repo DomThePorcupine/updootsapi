@@ -25,4 +25,4 @@ WORKDIR /app/src/github.com/domtheporcupine/updoots
 
 RUN go install
 # Start the API, using gin for auto reload/compile
-CMD ["$GOPATH/bin/updoots"]
+CMD ["go", "install", "&&", "$GOPATH/bin/updoots"]
