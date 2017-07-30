@@ -1,5 +1,9 @@
 #! /bin/bash
 
+# This script is designed to be used in production
+# it takes down current prod, cleans our old containers
+# rebuilds the app and then brings the api back up
+
 # Pull the most recent version
 git pull
 

@@ -36,6 +36,7 @@
     );
     then:
     create table `users` (
+        `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `userid` VARCHAR(20) NOT NULL UNIQUE,
         `admin` TINYINT(1) NOT NULL default 0
     );
