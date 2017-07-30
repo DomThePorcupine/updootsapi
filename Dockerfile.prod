@@ -4,6 +4,7 @@ FROM golang:1.8.3-alpine
 RUN apk update && apk add git bash mysql-client
 # Set up a go environment
 RUN mkdir -p /app/src/github.com/domtheporcupine/updoots
+COPY *.go /app/src/github.com/domtheporcupine/updoots
 RUN mkdir -p /app/bin
 RUN mkdir -p /app/pkg
 # Set go environment variables
@@ -24,4 +25,4 @@ WORKDIR /app/src/github.com/domtheporcupine/updoots
 
 RUN go install
 # Start the API, using gin for auto reload/compile
-CMD ["$GOPATH/bin/updoots""]
+CMD ["$GOPATH/bin/updoots"]
