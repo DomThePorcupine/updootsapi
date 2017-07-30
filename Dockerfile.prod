@@ -23,6 +23,6 @@ RUN go get github.com/rs/cors
 # Set our working directory
 WORKDIR /app/src/github.com/domtheporcupine/updoots
 
-RUN go install
+RUN go install /app/src/github.com/domtheporcupine/updoots
 # Start the API, using gin for auto reload/compile
-CMD ["go", "install", "&&", "$GOPATH/bin/updoots"]
+CMD ["$GOPATH/bin/updoots"]
