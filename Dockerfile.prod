@@ -21,8 +21,12 @@ RUN go get github.com/codegangsta/gin
 RUN go get github.com/rs/cors
 
 # Set our working directory
-WORKDIR /app/src/github.com/domtheporcupine/updoots
+WORKDIR /app
 
-RUN go install /app/src/github.com/domtheporcupine/updoots
+################################################
+## This is really the only difference between ##
+## the dev version and production version :)  ##
+################################################
+RUN go install github.com/domtheporcupine/updoots
 # Start the API, using gin for auto reload/compile
-CMD ["$GOPATH/bin/updoots"]
+CMD ["./bin/updoots"]

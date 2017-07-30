@@ -1,0 +1,18 @@
+updoots_web:
+  build: .
+  links:
+    - updoots_db
+  ports:
+    - "3000:3000"
+  volumes:
+    - .:/app/src/github.com/domtheporcupine/updoots
+updoots_db:
+  image: mysql
+  environment:
+    MYSQL_PASSWORD: npassword
+    MYSQL_USER: nuser
+    MYSQL_ROOT_PASSWORD: npassword
+  ports:
+    - "3306:3306"
+  volumes:
+    - /opt/mysql_data:/var/lib/mysql
