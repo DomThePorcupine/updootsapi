@@ -32,7 +32,7 @@ our geofences and not on some sort of school campus, it also assigns roles
 to people defining what they can and cannot do
 */
 func GetToken(w http.ResponseWriter, req *http.Request) {
-	
+	fmt.Println("Asked for token!")
 	// First we should parse to see if they are within
 	// the bounds of the geofence or even gave us a lat
 	// and long
