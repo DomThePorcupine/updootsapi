@@ -14,3 +14,4 @@ updoots_db:
     - "3306:3306"
   volumes:
     - /opt/mysql_data:/var/lib/mysql
+    

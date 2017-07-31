@@ -14,3 +14,4 @@ updoots_db:
     MYSQL_ROOT_PASSWORD: npassword
   ports:
     - "3306:3306"
+    
