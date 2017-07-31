@@ -12,6 +12,7 @@ func validate(protectedPage http.Handler) http.HandlerFunc {
 		// If no Auth cookie is set then return a 404 not found
 		cookie, err := req.Cookie("Authorization")
 		if err != nil {
+			fmt.Println("Error with cookie")
 			http.NotFound(w, req)
 			return
 		}

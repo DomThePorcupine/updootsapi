@@ -48,7 +48,7 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		// Internal server error
-		fmt.Println(err.Error())
+		json.NewEncoder(w).Encode(Response{"Internal server error", "server_error"})
 		return
 	}
 
