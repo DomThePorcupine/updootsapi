@@ -4,6 +4,9 @@
 # it takes down current prod, cleans our old containers
 # rebuilds the app and then brings the api back up
 
+# Reset everything so that git will shut up
+git reset --hard origin/master
+
 # Pull the most recent version
 git pull
 
