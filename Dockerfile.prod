@@ -5,6 +5,7 @@ RUN apk update && apk add git bash mysql-client
 # Set up a go environment
 RUN mkdir -p /app/src/github.com/domtheporcupine/updoots
 COPY *.go /app/src/github.com/domtheporcupine/updoots/
+COPY pub /app/src/github.com/domtheporcupine/updoots/pub/
 RUN mkdir -p /app/bin
 RUN mkdir -p /app/pkg
 # Set go environment variables
