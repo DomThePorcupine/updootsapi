@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/rs/cors"
 )
 
@@ -30,7 +30,7 @@ func main() {
 	fmt.Println("+----------------------+")
 
 	// Note that here we must use a strict = rather than :=
-	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb?charset=utf8mb4&parseTime=true")
+	db, err = sql.Open("postgres", "postgres://nuser:npassword@tcp(updoots_db:5432)/testdb?charset=utf8mb4&parseTime=true")
 	if err != nil {
 		return
 	}
@@ -49,5 +49,5 @@ func main() {
 
 	handler := c.Handler(router)
         
-	log.Fatal(http.ListenAndServe(":3000", handler))
+	log.Fatal(http.ListenAndServe(":3001", handler))
 }

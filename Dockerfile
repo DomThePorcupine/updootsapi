@@ -10,7 +10,7 @@ RUN mkdir -p /app/pkg
 ENV GOPATH /app
 ENV PATH $PATH:/app/bin
 # Install our go dependencies
-RUN go get github.com/go-sql-driver/mysql
+RUN go get github.com/lib/pq
 RUN go get github.com/dgrijalva/jwt-go
 RUN go get github.com/gorilla/mux
 RUN go get github.com/gorilla/handlers

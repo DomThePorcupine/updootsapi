@@ -3,15 +3,16 @@ updoots_web:
   links:
     - updoots_db
   ports:
-    - "3000:3000"
+    - "3000:3001"
 updoots_db:
-  image: mysql
+  image: postgres
   environment:
-    MYSQL_PASSWORD: npassword
-    MYSQL_USER: nuser
-    MYSQL_ROOT_PASSWORD: npassword
+    POSTGRES_PASSWORD: npassword
+    POSTGRES_USER: nuser
+    POSTGRES_ROOT_PASSWORD: npassword
   ports:
-    - "3306:3306"
+    - "5432:5432"
   volumes:
-    - /opt/mysql_data:/var/lib/mysql
+    - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    - ./postgres-data:/var/lib/postgresql/data
     

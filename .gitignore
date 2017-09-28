@@ -17,3 +17,4 @@ pub/node_modules
 pub/test/e2e/mock-template-build
 *.py
 __pycache__/
+*.json
