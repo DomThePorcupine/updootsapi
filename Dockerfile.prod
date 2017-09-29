@@ -24,6 +24,8 @@ RUN go get github.com/rs/cors
 # Set our working directory
 WORKDIR /app
 
+ENV UPDOOTS_HOST=https://app.updoot.us
+
 ################################################
 ## This is really the only difference between ##
 ## the dev version and production version :)  ##
