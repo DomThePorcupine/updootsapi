@@ -19,6 +19,8 @@ RUN go get golang.org/x/crypto/bcrypt
 RUN go get github.com/codegangsta/gin
 RUN go get github.com/rs/cors
 
+ENV UPDOOTS_HOST=http://192.168.1.51:8100
+
 # Build our app
 WORKDIR /app/src/github.com/domtheporcupine/updoots
 

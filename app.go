@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/cors"
@@ -30,7 +31,7 @@ func main() {
 	fmt.Println("+----------------------+")
 
 	// Note that here we must use a strict = rather than :=
-	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/testdb?charset=utf8mb4&parseTime=true")
+	db, err = sql.Open("mysql", "nuser:npassword@tcp(updoots_db:3306)/updoots?charset=utf8mb4&parseTime=true")
 	if err != nil {
 		return
 	}
@@ -41,13 +42,13 @@ func main() {
 	// Make sure to allow all requests
 
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://192.168.66.50:8100","http://127.0.0.1:8100","https://app.updoot.us","https://updoot.us"},
+		AllowedOrigins:   []string{os.Getenv("UPDOOTS_HOST")},
 		AllowCredentials: true,
-		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
-		AllowedHeaders: []string{"*"},
+		AllowedMethods:   []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
 	})
 
 	handler := c.Handler(router)
-        
-	log.Fatal(http.ListenAndServe(":3000", handler))
+
+	log.Fatal(http.ListenAndServe(":3001", handler))
 }

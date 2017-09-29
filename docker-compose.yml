@@ -14,4 +14,10 @@ updoots_db:
     MYSQL_ROOT_PASSWORD: npassword
   ports:
     - "3306:3306"
+adminer:
+  image: adminer
+  ports:
+    - "4500:8080"
+  links:
+    - updoots_db
     

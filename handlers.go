@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"time"
 	"unicode/utf8"
 
@@ -19,11 +20,11 @@ func checkError(err error) {
 }
 
 type Claims struct {
-    Expires int64  `json:"exp"`
+	Expires int64  `json:"exp"`
 	Admin   bool   `json:"admin"`
 	UserID  string `json:"userid"`
-    // recommended having
-    jwt.StandardClaims
+	// recommended having
+	jwt.StandardClaims
 }
 
 /*
@@ -38,12 +39,12 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 	// and long
 	var tr TokenRequest
 	json.NewDecoder(req.Body).Decode(&tr)
-	
+
 	if tr.UserID == "" {
 		json.NewEncoder(w).Encode(Response{"No user id given", "invalid_id"})
 		return
 	}
-	
+
 	rows, err := db.Query("SELECT admin, userid from users where userid = ?", tr.UserID)
 
 	if err != nil {
@@ -60,7 +61,7 @@ func GetToken(w http.ResponseWriter, req *http.Request) {
 		rows.Scan(&truefalse, &uid)
 	}
 
-	if(truefalse == -1) {
+	if truefalse == -1 {
 		json.NewEncoder(w).Encode(Response{"No user id given", "invalid_id"})
 		return
 	}
@@ -114,12 +115,12 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rows, err := db.Query("select messages.created, id, messages.message, ifnull(doots,0) as totalvotes " + 
-							"from messages left join(select votes.message, " +
-							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
-							"as doots from votes group by votes.message) as votes " + 
-							"on messages.id = votes.message having totalvotes > -3 order by messages.created desc")
-							
+	rows, err := db.Query("select posts.created, id, posts.message, ifnull(doots,0) as totalvotes " +
+		"from posts left join(select votes.message, " +
+		"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " +
+		"as doots from votes group by votes.message) as votes " +
+		"on posts.id = votes.message having totalvotes > -3 order by posts.created desc")
+
 	// Need to also get what we voted on for visual ques
 	votedrows, err := db.Query("select updoot, downdoot, message from votes where userid=?", clms.UserID)
 
@@ -128,12 +129,12 @@ func GetAllMessagesNew(w http.ResponseWriter, req *http.Request) {
 	var up int
 	var down int
 	var id int
-	
+
 	for votedrows.Next() {
 		votedrows.Scan(&up, &down, &id)
-		if(up == 1) {
+		if up == 1 {
 			votes[id] = 1
-		} else if(down == 1) {
+		} else if down == 1 {
 			votes[id] = -1
 		}
 		// In go if an int doesn't
@@ -195,11 +196,17 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rows, err := db.Query("select messages.created, id, messages.message, ifnull(doots,0) as totalvotes " + 
-							"from messages left join(select votes.message, " +
-							"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " + 
-							"as doots from votes group by votes.message) as votes " + 
-							"on messages.id = votes.message having totalvotes > -3 order by ifnull(doots,0) desc, messages.created desc")
+	rows, err := db.Query("select posts.created, id, posts.message, ifnull(doots,0) as totalvotes " +
+		"from posts left join(select votes.message, " +
+		"cast((sum(votes.updoot) - sum(votes.downdoot)) as signed) " +
+		"as doots from votes group by votes.message) as votes " +
+		"on posts.id = votes.message having totalvotes > -3 order by ifnull(doots,0) desc, posts.created desc")
+
+	if err != nil {
+		fmt.Println("Foo")
+		fmt.Println(err.Error())
+		return
+	}
 
 	// Need to also get what we voted on for visual ques
 	votedrows, err := db.Query("select updoot, downdoot, message from votes where userid=?", clms.UserID)
@@ -209,12 +216,12 @@ func GetAllMessagesTop(w http.ResponseWriter, req *http.Request) {
 	var up int
 	var down int
 	var id int
-	
+
 	for votedrows.Next() {
 		votedrows.Scan(&up, &down, &id)
-		if(up == 1) {
+		if up == 1 {
 			votes[id] = 1
-		} else if(down == 1) {
+		} else if down == 1 {
 			votes[id] = -1
 		}
 		// In go if an int doesn't
@@ -274,35 +281,35 @@ func CreateMessage(w http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(w).Encode(Response{"invalid id", "invalid_id"})
 		return
 	}
-	
+
 	var nMessage Newmessage
 	json.NewDecoder(req.Body).Decode(&nMessage)
 	fmt.Println(string(nMessage.Message))
 	fmt.Println(utf8.ValidString(nMessage.Message))
 
 	// For now simply make sure we only keep 100 messages
-	dl, err := db.Prepare(	"delete message from messages as message " + 
-							"join(select created from messages order by created desc limit 1 offset 98)" + 
-							" ctd on message.created < ctd.created;")
+	dl, err := db.Prepare("delete message from posts as message " +
+		"join(select created from posts order by created desc limit 1 offset 98)" +
+		" ctd on message.created < ctd.created;")
 	if err != nil {
 		return
 	}
 	dl.Exec()
 	// declare a new message
 	// All new messages will have 0 updoots to start
-	stmt, err := db.Prepare("INSERT into messages (message, userid) values( ? , ?)")
+	stmt, err := db.Prepare("INSERT into posts (message, userid) values( ? , ?)")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	
+
 	_, err = stmt.Exec(nMessage.Message, clms.UserID)
 
 	if err != nil {
 		checkError(err)
 	}
 	//id, err := res.LastInsertId()
-	
+
 	// return the newly created object
 	json.NewEncoder(w).Encode(Empty{})
 }
@@ -331,14 +338,14 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 			stmt.Exec(vote.Message, clms.UserID)
-			return
+
 		} else if vote.Doot == 0 {
 			stmt, err := db.Prepare("INSERT votes SET message=?,userid=?,downdoot=1")
 			if err != nil {
 				return
 			}
 			stmt.Exec(vote.Message, clms.UserID)
-			return
+
 		} else {
 			json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
 			return
@@ -352,13 +359,13 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 			fmt.Println(err)
 			return
 		}
-		
+
 		for rows.Next() {
 			rows.Scan(&count)
 		}
 		fmt.Println("Count returned")
 		fmt.Println(count)
-		
+
 		if count == 0 {
 			// We can safely preform the action they want
 			if vote.Doot == 1 {
@@ -380,7 +387,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 				json.NewEncoder(w).Encode(Response{"invalid action", "invalid_action"})
 				return
 			}
-		} else if count == 1{
+		} else if count == 1 {
 			// otherwise we simply update the entry that already exists
 			if vote.Doot == 1 {
 				stmt, err := db.Prepare("UPDATE votes SET updoot=1, downdoot=0 where message=? and userid=?")
@@ -407,6 +414,7 @@ func DootOnMessage(w http.ResponseWriter, req *http.Request) {
 	}
 
 	rows, err := db.Query("select ifnull((sum(votes.updoot) - sum(votes.downdoot)),0) as updoots from votes where votes.message=?", vote.Message)
+
 	if err != nil {
 		fmt.Println("BADDDDDDDDDDD")
 		json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
@@ -429,19 +437,25 @@ func Register(w http.ResponseWriter, req *http.Request) {
 	if tr.UserID == "" {
 		return
 	}
-	
-	fmt.Println(tr.UserID)
 
-	stmt, err := db.Prepare("INSERT into users (userid) values(?)")
-	if err != nil {
-		json.NewEncoder(w).Encode(Response{"something bad happened first", "invalid_action"})
-		return
-	}
-	_, err = stmt.Exec(tr.UserID)
+	isValid, err := regexp.MatchString("[a-z]+[0-9]+@pitt.edu", tr.UserID)
 
-	if err != nil {
-		json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
-		return
+	if isValid || err != nil {
+		stmt, err := db.Prepare("INSERT into users (userid) values(?)")
+		if err != nil {
+			json.NewEncoder(w).Encode(Response{"something bad happened first", "invalid_action"})
+			return
+		}
+		_, err = stmt.Exec(tr.UserID)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
+			return
+		}
+	} else {
+		str, _ := json.Marshal(Response{"Invalid pitt email", "invalid_action"})
+		http.Error(w, string(str), 400)
+		// json.NewEncoder(w).Encode(Response{})
 	}
 
 }
