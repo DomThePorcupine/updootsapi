@@ -443,13 +443,13 @@ func Register(w http.ResponseWriter, req *http.Request) {
 	if isValid || err != nil {
 		stmt, err := db.Prepare("INSERT into users (userid) values(?)")
 		if err != nil {
-			json.NewEncoder(w).Encode(Response{"something bad happened first", "invalid_action"})
+			json.NewEncoder(w).Encode(Response{err.Error(), "invalid_action"})
 			return
 		}
 		_, err = stmt.Exec(tr.UserID)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(Response{"something bad happened", "invalid_action"})
+			json.NewEncoder(w).Encode(Response{err.Error(), "invalid_action"})
 			return
 		}
 	} else {
