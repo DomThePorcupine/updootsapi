@@ -3,7 +3,7 @@ updoots_web:
   links:
     - updoots_db
   ports:
-    - "3000:3001"
+    - "4080:3001"
 updoots_db:
   image: mysql
   environment:
